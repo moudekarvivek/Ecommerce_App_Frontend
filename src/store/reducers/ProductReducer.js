@@ -7,9 +7,9 @@ const initialState  = {
 export const productReducer = (state = initialState, action) => {
     switch (action.type) {
         case "FETCH_PRODUCTS":
-            return{
+            return {
                 ...state,
-                Products: action.payload,
+                products: action.payload,
                 pagination: {
                     ...state.pagination,
                     pageNumber: action.pageNumber,
