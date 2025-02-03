@@ -7,16 +7,15 @@ import { fetchProducts } from "../store/actions";
 const Products = () => {
     const isLoading = false;
     const errorMessage = "";
-    const {products} = useSelector(
+    const { products } = useSelector(
         (state) => state.products
-    )
+    );
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(fetchProducts());
     }, [dispatch]);
-
-
+    
     // const products = [
     //        {
     //           productId: 652,
