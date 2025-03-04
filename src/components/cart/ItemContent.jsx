@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { HiOutlineTrash } from "react-icons/hi";
 import SetQuantity from "./SetQuantity";
+import { useDispatch } from "react-redux";
+import { increaseCartQuantity } from "../../store/actions";
+import toast from "react-hot-toast";
 
 const ItemContent = ({
     productId,
@@ -12,15 +15,26 @@ const ItemContent = ({
     discount,
     specialPrice,
     cartId,
-}) => {
+  }) => {
     const [currentQuantity, setCurrentQuantity] = useState(quantity);
+    const dispatch = useDispatch();
+
+    const handleQtyIncrease = (cartItems) => {
+        dispatch(increaseCartQuantity(
+            cartItems,
+            toast,
+            currentQuantity,
+            setCurrentQuantity
+        ));
+    };
+    
     return (
         <div className="grid md:grid-cols-5 grid-cols-4 md:text-md text-sm gap-4   items-center  border-[1px] border-slate-200  rounded-md  lg:px-4  py-4 p-2">
             <div className="md:col-span-2 justify-self-start flex  flex-col gap-2 ">
                 <div className="flex md:flex-row flex-col lg:gap-4 sm:gap-3 gap-0 items-start ">
-                    <h3 className="lg:text-[17px] text-sm font-semibold text-slate-600">
-                     {productName}
-                    </h3>   
+                   <h3 className="lg:text-[17px] text-sm font-semibold text-slate-600">
+                    {productName}
+                   </h3>
                 </div>
 
                 <div className="md:w-36 sm:w-24 w-12">
@@ -49,7 +63,15 @@ const ItemContent = ({
                 <SetQuantity 
                     quantity={currentQuantity}
                     cardCounter={true}
-                    handleQtyIncrease={() => {}}
+                    handeQtyIncrease={() => handleQtyIncrease({
+                        image,
+                        productName,
+                        description,
+                        specialPrice,
+                        price,
+                        productId,
+                        quantity,
+                    })}
                     handleQtyDecrease={() => {}}/>
             </div>
 

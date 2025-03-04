@@ -1,10 +1,9 @@
-import api from "../../api/api";
+import api from "../../api/api"
 
 export const fetchProducts = (queryString) => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
         const { data } = await api.get(`/public/products?${queryString}`);
-        console.log("API Response:", data);
         dispatch({
             type: "FETCH_PRODUCTS",
             payload: data.content,
@@ -19,16 +18,16 @@ export const fetchProducts = (queryString) => async (dispatch) => {
         console.log(error);
         dispatch({ 
             type: "IS_ERROR",
-            payload: error?.response?.data?.message || "Failed to fetch products", //Optional Chaining to know response exist in error
-         }); 
+            payload: error?.response?.data?.message || "Failed to fetch products",
+         });
     }
 };
 
-export const fetchCategories = (queryString) => async (dispatch) => {
+
+export const fetchCategories = () => async (dispatch) => {
     try {
         dispatch({ type: "CATEGORY_LOADER" });
         const { data } = await api.get(`/public/categories`);
-        console.log("API Response:", data);
         dispatch({
             type: "FETCH_CATEGORIES",
             payload: data.content,
@@ -43,23 +42,23 @@ export const fetchCategories = (queryString) => async (dispatch) => {
         console.log(error);
         dispatch({ 
             type: "IS_ERROR",
-            payload: error?.response?.data?.message || "Failed to fetch category", //Optional Chaining to know response exist in error
-         }); 
+            payload: error?.response?.data?.message || "Failed to fetch categories",
+         });
     }
 };
 
+
 export const addToCart = (data, qty = 1, toast) => 
     (dispatch, getState) => {
-
-        //Find the Product
+        // Find the product
         const { products } = getState().products;
         const getProduct = products.find(
             (item) => item.productId === data.productId
-        )
-        
-        //check for stocks
+        );
+
+        // Check for stocks
         const isQuantityExist = getProduct.quantity >= qty;
-        
+
         // If in stock -> add
         if (isQuantityExist) {
             dispatch({ type: "ADD_CART", payload: {...data, quantity: qty}});
@@ -67,6 +66,34 @@ export const addToCart = (data, qty = 1, toast) =>
             localStorage.setItem("cartItems", JSON.stringify(getState().carts.cart));
         } else {
             // error
-            toast.error("Product out of stock");
+            toast.error("Out of stock");
         }
 };
+
+
+export const increaseCartQuantity = 
+    (data, toast, currentQuantity, setCurrentQuantity) =>
+    (dispatch, getState) => {
+        // Find the product
+        const { products } = getState().products;
+        
+        const getProduct = products.find(
+            (item) => item.productId === data.productId
+        );
+
+        const isQuantityExist = getProduct.quantity >= currentQuantity + 1;
+
+        if (isQuantityExist) {
+            const newQuantity = currentQuantity + 1;
+            setCurrentQuantity(newQuantity);
+
+            dispatch({
+                type: "ADD_CART",
+                payload: {...data, quantity: newQuantity + 1 },
+            });
+            localStorage.setItem("cartItems", JSON.stringify(getState().carts.cart));
+        } else {
+            toast.error("Quantity Reached to Limit");
+        }
+
+    };
