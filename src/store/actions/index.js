@@ -130,11 +130,11 @@ export const registerNewUser
 }
 
 
-export const authenticateSignUpUser 
+export const authenticateSignInUser 
     = (sendData, toast, reset, navigate, setLoader) => async (dispatch) => {
         try {
             setLoader(true);
-            const { data } = await api.post("/auth/signup", sendData);
+            const { data } = await api.post("/auth/signin", sendData);
             dispatch({ type: "LOGIN_USER", payload: data });
             localStorage.setItem("auth", JSON.stringify(data));
             reset()
