@@ -98,6 +98,8 @@ export const increaseCartQuantity =
 
     };
 
+
+
 export const decreaseCartQuantity = 
     (data, newQuantity) => (dispatch, getState) => {
         dispatch({
@@ -107,27 +109,12 @@ export const decreaseCartQuantity =
         localStorage.setItem("cartItems", JSON.stringify(getState().carts.cart));
     }
 
-export const removeFromCart = (data, toast) => (dispatch, getState) => {
+export const removeFromCart =  (data, toast) => (dispatch, getState) => {
     dispatch({type: "REMOVE_CART", payload: data });
-    toast.success(`${data.productName} removed from the cart`);
+    toast.success(`${data.productName} removed from cart`);
     localStorage.setItem("cartItems", JSON.stringify(getState().carts.cart));
 }
 
-export const registerNewUser 
-    = (sendData, toast, reset, navigate, setLoader) => async (dispatch) => {
-        try {
-            setLoader(true);
-            const { data } = await api.post("/auth/signup", sendData);
-            reset()
-            toast.success(data?.message || "User Registered Successfully");
-            navigate("/login");
-        } catch (error) {
-            console.log(error);
-            toast.error(error?.response?.data?.message || error?.response?.data?.password || "Internal Server Error");
-        } finally {
-            setLoader(false);
-        }
-}
 
 
 export const authenticateSignInUser 
@@ -137,12 +124,29 @@ export const authenticateSignInUser
             const { data } = await api.post("/auth/signin", sendData);
             dispatch({ type: "LOGIN_USER", payload: data });
             localStorage.setItem("auth", JSON.stringify(data));
-            reset()
-            toast.success("Register Success");
+            reset();
+            toast.success("Login Success");
             navigate("/");
         } catch (error) {
             console.log(error);
             toast.error(error?.response?.data?.message || "Internal Server Error");
+        } finally {
+            setLoader(false);
+        }
+}
+
+
+export const registerNewUser 
+    = (sendData, toast, reset, navigate, setLoader) => async (dispatch) => {
+        try {
+            setLoader(true);
+            const { data } = await api.post("/auth/signup", sendData);
+            reset();
+            toast.success(data?.message || "User Registered Successfully");
+            navigate("/login");
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || error?.response?.data?.password || "Internal Server Error");
         } finally {
             setLoader(false);
         }
@@ -155,8 +159,14 @@ export const logOutUser = (navigate) => (dispatch) => {
     navigate("/login");
 };
 
-export const addUpdateUserAddress = (sendData, toast, addressId, setOpenAddressModal) => async (dispatch, getState) => {
-    // const { user } = getState().auth;
+export const addUpdateUserAddress =
+     (sendData, toast, addressId, setOpenAddressModal) => async (dispatch, getState) => {
+    /*
+    const { user } = getState().auth;
+    await api.post(`/addresses`, sendData, {
+          headers: { Authorization: "Bearer " + user.jwtToken },
+        });
+    */
     dispatch({ type:"BUTTON_LOADER" });
     try {
         if (!addressId) {
@@ -165,12 +175,12 @@ export const addUpdateUserAddress = (sendData, toast, addressId, setOpenAddressM
             await api.put(`/addresses/${addressId}`, sendData);
         }
         dispatch(getUserAddresses());
-        toast.success("Address saved Successfully");
-        dispatch({ type:"IS_SUCCESS" })
+        toast.success("Address saved successfully");
+        dispatch({ type:"IS_SUCCESS" });
     } catch (error) {
         console.log(error);
-        toast.error(error?.response?.data?.message ||  "Internal Server Error");
-        dispatch({ type:"IS_ERROR", payload: null })
+        toast.error(error?.response?.data?.message || "Internal Server Error");
+        dispatch({ type:"IS_ERROR", payload: null });
     } finally {
         setOpenAddressModal(false);
     }
@@ -185,7 +195,7 @@ export const deleteUserAddress =
         dispatch({ type: "IS_SUCCESS" });
         dispatch(getUserAddresses());
         dispatch(clearCheckoutAddress());
-        toast.success("Address deleted Successfully");
+        toast.success("Address deleted successfully");
     } catch (error) {
         console.log(error);
         dispatch({ 
@@ -225,12 +235,14 @@ export const selectUserCheckoutAddress = (address) => {
     }
 };
 
+
 export const addPaymentMethod = (method) => {
     return {
         type: "ADD_PAYMENT_METHOD",
         payload: method,
     }
 };
+
 
 export const createUserCart = (sendCartItems) => async (dispatch, getState) => {
     try {
@@ -245,6 +257,7 @@ export const createUserCart = (sendCartItems) => async (dispatch, getState) => {
          });
     }
 };
+
 
 export const getUserCart = () => async (dispatch, getState) => {
     try {
